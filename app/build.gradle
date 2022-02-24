@@ -1,16 +1,18 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id("io.gitlab.arturbosch.detekt").version("$detekt_version")
 }
 
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-parcelize'
+apply from: '../config/detekt/detekt.gradle'
 
 android {
     compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    buildToolsVersion "31.0.0"
 
     defaultConfig {
         applicationId "com.example.marvelapp"
@@ -31,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation project(":core")
 
     // AndroidX
     implementation 'androidx.core:core-ktx:1.6.0'
