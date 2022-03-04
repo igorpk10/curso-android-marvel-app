@@ -1,6 +1,8 @@
 package com.example.marvelapp.framework.di
 
+import android.os.Build
 import com.example.marvelapp.BuildConfig
+import com.igaopk10.core.data.network.interceptor.AuthorizationInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,11 +12,14 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    private const val TIME_OUT_SECONDS: Long = 15L
 
     @Provides
     fun provideLoginInterceptor(): HttpLoggingInterceptor {
@@ -28,18 +33,29 @@ object NetworkModule {
     }
 
     @Provides
+    fun provideAuthorizationInterceptor(): AuthorizationInterceptor {
+        return AuthorizationInterceptor(
+            publicKey = BuildConfig.PUBLIC_KEY,
+            privateKey = BuildConfig.PRIVATE_KEY,
+            calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        )
+    }
+
+    @Provides
     fun provideOkHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor
+        loggingInterceptor: HttpLoggingInterceptor,
+        authorizationInterceptor: AuthorizationInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .readTimeout(15, TimeUnit.SECONDS)
-            .connectTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(authorizationInterceptor)
+            .readTimeout(TIME_OUT_SECONDS, TimeUnit.SECONDS)
+            .connectTimeout(TIME_OUT_SECONDS, TimeUnit.SECONDS)
             .build()
     }
 
     @Provides
-    fun provideGsonConverterFactory(): GsonConverterFactory{
+    fun provideGsonConverterFactory(): GsonConverterFactory {
         return GsonConverterFactory.create()
     }
 
