@@ -1,4 +1,4 @@
-package com.igaopk10.core.data.network.response
+package com.example.marvelapp.framework.network.response
 
 data class CharacterResponse(
     val id: String,
