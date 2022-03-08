@@ -1,12 +1,12 @@
 package com.example.marvelapp.presentation.characters
 
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import com.igaopk10.core.domain.model.Character
 
 
-class CharactersAdapter : ListAdapter<Character, CharacterViewHolder>(diffCallback) {
+class CharactersAdapter : PagingDataAdapter<Character, CharacterViewHolder>(diffCallback) {
 
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<Character>() {
@@ -32,6 +32,8 @@ class CharactersAdapter : ListAdapter<Character, CharacterViewHolder>(diffCallba
     }
 
     override fun onBindViewHolder(holder: CharacterViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        getItem(position)?.let {
+            holder.bind(it)
+        }
     }
 }

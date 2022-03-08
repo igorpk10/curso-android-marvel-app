@@ -1,6 +1,5 @@
 package com.example.marvelapp.framework.paging
 
-import android.os.LimitExceededException
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.marvelapp.framework.network.response.DataWrapperResponse
@@ -18,7 +17,7 @@ class CharactersPagingSource(
         private const val LIMIT = 20
     }
 
-
+    @Suppress("TooGenericExceptionCaught")
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Character> {
         return try {
             val offset = params.key ?: 0
