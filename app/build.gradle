@@ -18,6 +18,15 @@ android {
     compileSdkVersion 32
     buildToolsVersion "31.0.0"
 
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\igorg\\AndroidStudioProjects\\curso-android-marvel-app\\store\\marvel_app_key_store.jks')
+            storePassword '-'
+            keyAlias 'marvelapp'
+            keyPassword '-'
+        }
+    }
+
     defaultConfig {
         applicationId "com.igorpk10.marvelapp"
         minSdkVersion 23
@@ -33,8 +42,30 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            debuggable true
+        }
+
+        staging {
+            initWith debug
+            minifyEnabled true
+            applicationIdSuffix '.staging'
+
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-staging.pro'
+        }
+
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.release
+
+            // Enables code shrinking, obfuscation, and optimization for only
+            // your project's release build type.
+            minifyEnabled true
+
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            shrinkResources true
+
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
