@@ -20,7 +20,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('C:\\Users\\igorg\\AndroidStudioProjects\\curso-android-marvel-app\\store\\marvel_app_key_store.jks')
+            storeFile file('$rootDir/store/marvel_app_key_store.jks')
             storePassword '-'
             keyAlias 'marvelapp'
             keyPassword '-'
