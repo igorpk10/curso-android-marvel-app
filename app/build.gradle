@@ -40,6 +40,11 @@ android {
         buildConfigField "String", "PUBLIC_KEY", apikeyProperties['PUBLIC_KEY']
         buildConfigField "String", "PRIVATE_KEY", apikeyProperties['PRIVATE_KEY']
         buildConfigField "String", "BASE_URL", '"https://gateway.marvel.com/v1/public/"'
+
+        // The following argument makes the Android Test Orchestrator run its
+        // "pm clear" command after each test invocation. This command ensures
+        // that the app's state is completely cleared between tests.
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -83,6 +88,11 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+
+    //Configura o Orchestrator. Este serve para que os testes rodem todos, mesmo que algum falhem.
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 }
 
@@ -150,4 +160,6 @@ dependencies {
 
     def fragment_version = "1.4.0"
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
+
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
 }
