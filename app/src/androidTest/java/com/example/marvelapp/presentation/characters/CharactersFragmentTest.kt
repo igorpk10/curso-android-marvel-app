@@ -3,8 +3,8 @@ package com.example.marvelapp.presentation.characters
 import okhttp3.mockwebserver.MockWebServer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.marvelapp.R
 import com.example.marvelapp.extension.asJsonString
@@ -45,9 +45,35 @@ class CharactersFragmentTest {
             .check(matches(isDisplayed()))
     }
 
+    @Test
+    fun shouldLoadMoreCharactersWhenNewPageIsRequested() {
+        server.enqueue(MockResponse().setBody("characters_p1.json".asJsonString()))
+        server.enqueue(MockResponse().setBody("characters_p2.json".asJsonString()))
+
+
+        onView(withId(R.id.recycler_characters))
+            .check(matches(isDisplayed()))
+            .perform(RecyclerViewActions.scrollToPosition<CharactersLoadMoreStateViewHolder>(20))
+
+        onView(withText("Amora")).check(matches(isDisplayed()))
+    }
+
+
+    fun shouldShowErrorViewWhenReceiveErrorByApi() {
+        //Arrange
+        server.enqueue(MockResponse().setResponseCode(404))
+
+        //Action
+        onView(
+            withId(R.id.text_initial_loading_error)
+        ).check(matches(isDisplayed()))
+
+        //Assert
+    }
+
 
     @After
-    fun tearDown(){
+    fun tearDown() {
         server.shutdown()
     }
 
