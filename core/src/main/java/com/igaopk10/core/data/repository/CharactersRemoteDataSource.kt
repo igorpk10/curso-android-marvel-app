@@ -1,6 +1,8 @@
 package com.igaopk10.core.data.repository
 
-interface CharactersRemoteDataSource<T> {
+import com.igaopk10.core.domain.model.CharacterPaging
 
-    suspend fun fetchCharacters(queries: Map<String, String>): T
+interface CharactersRemoteDataSource {
+
+    suspend fun fetchCharacters(queries: Map<String, String>): CharacterPaging
 }
