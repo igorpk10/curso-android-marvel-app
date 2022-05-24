@@ -15,11 +15,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.example.marvelapp.R
 import com.example.marvelapp.databinding.FragmentCharactersBinding
+import com.example.marvelapp.framework.imageloader.ImageLoader
 import com.example.marvelapp.presentation.details.DetailViewArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CharactersFragment : Fragment() {
@@ -34,6 +36,9 @@ class CharactersFragment : Fragment() {
     private lateinit var characterAdapter: CharactersAdapter
 
     private val viewModel: CharactersViewModel by viewModels()
+
+    @Inject
+    private lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,7 +64,7 @@ class CharactersFragment : Fragment() {
     }
 
     private fun initCharactersAdapter() {
-        characterAdapter = CharactersAdapter { character, view ->
+        characterAdapter = CharactersAdapter(imageLoader) { character, view ->
             val extras = FragmentNavigatorExtras(
                 view to character.name
             )
