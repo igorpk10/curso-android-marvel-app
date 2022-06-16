@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
-import com.bumptech.glide.Glide
-import com.example.marvelapp.R
 import com.example.marvelapp.databinding.FragmentDetailBinding
 import com.example.marvelapp.framework.imageloader.ImageLoader
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,6 +15,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class DetailFragment : Fragment() {
+
+    companion object {
+        private const val FLIPPER_LOADING = 0
+        private const val FLIPPER_DETAIL = 1
+        private const val FLIPPER_ERROR = 2
+        private const val FLIPPER_EMPTY = 3
+    }
 
     private var _binding: FragmentDetailBinding? = null
     private val binding: FragmentDetailBinding get() = _binding!!
@@ -56,22 +61,27 @@ class DetailFragment : Fragment() {
 
         setSharedElementTransitionOnEnter()
 
+        binding.includeErrorView.buttonRetry.setOnClickListener {
+            viewModel.getCharacterCategorys(detailViewArg.characterId)
+        }
+
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
-            when (uiState) {
-                DetailViewModel.UiState.Error -> {
-                }
+            binding.flipperDetail.displayedChild = when (uiState) {
                 is DetailViewModel.UiState.Success -> {
                     binding.recyclerParentDetail.run {
                         setHasFixedSize(true)
                         adapter = DetailParentAdapter(uiState.detailParentList, imageLoader)
                     }
+                    FLIPPER_DETAIL
                 }
-                DetailViewModel.UiState.Loading -> {
-                }
+                DetailViewModel.UiState.Loading -> FLIPPER_LOADING
+                DetailViewModel.UiState.Empty -> FLIPPER_EMPTY
+                DetailViewModel.UiState.Error -> FLIPPER_ERROR
+
             }
         }
 
-        viewModel.getComics(detailViewArg.characterId)
+        viewModel.getCharacterCategorys(detailViewArg.characterId)
     }
 
     // Define a animação da transição como "move"
