@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.marvelapp.R
@@ -20,10 +21,12 @@ class DetailFragment : Fragment() {
     private var _binding: FragmentDetailBinding? = null
     private val binding: FragmentDetailBinding get() = _binding!!
 
+    private val viewModel: DetailViewModel by viewModels()
+
     private val args by navArgs<DetailFragmentArgs>()
 
     @Inject
-    private lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,13 +49,29 @@ class DetailFragment : Fragment() {
             transitionName = detailViewArg.name
             imageLoader.load(
                 imageView = this,
-                imageURL = detailViewArg.imageURL,
-                fallback = R.drawable.ic_img_loading_error
+                imageURL = detailViewArg.imageURL
             )
 
         }
 
         setSharedElementTransitionOnEnter()
+
+        viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
+            when (uiState) {
+                DetailViewModel.UiState.Error -> {
+                }
+                is DetailViewModel.UiState.Success -> {
+                    binding.recyclerParentDetail.run {
+                        setHasFixedSize(true)
+                        adapter = DetailParentAdapter(uiState.detailParentList, imageLoader)
+                    }
+                }
+                DetailViewModel.UiState.Loading -> {
+                }
+            }
+        }
+
+        viewModel.getComics(detailViewArg.characterId)
     }
 
     // Define a animação da transição como "move"

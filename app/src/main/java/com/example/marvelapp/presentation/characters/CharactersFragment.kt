@@ -38,7 +38,7 @@ class CharactersFragment : Fragment() {
     private val viewModel: CharactersViewModel by viewModels()
 
     @Inject
-    private lateinit var imageLoader: ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,7 +72,11 @@ class CharactersFragment : Fragment() {
             val directions = CharactersFragmentDirections
                 .actionCharactersFragmentToDetailFragment(
                     character.name,
-                    DetailViewArgs(character.name, character.imageUrl)
+                    DetailViewArgs(
+                        characterId = character.id,
+                        name = character.name,
+                        imageURL = character.imageUrl
+                    )
                 )
 
             findNavController().navigate(directions, extras)

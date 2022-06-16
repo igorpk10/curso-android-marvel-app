@@ -5,16 +5,17 @@ import com.igaopk10.core.domain.model.Character
 
 data class CharacterResponse(
     @SerializedName("id")
-    val id: String,
+    val id: Int,
     @SerializedName("name")
     val name: String,
     @SerializedName("thumbnail")
     val thumbNail: ThumbnailResponse
 )
 
-fun CharacterResponse.toCharacterModel(): Character{
+fun CharacterResponse.toCharacterModel(): Character {
     return Character(
+        id = this.id,
         name = this.name,
-        imageUrl = "${this.thumbNail.path}.${thumbNail.extension}".replace("http", "https")
+        imageUrl = this.thumbNail.getHttpsURL()
     )
 }

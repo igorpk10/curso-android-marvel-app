@@ -14,7 +14,7 @@ class DataWrapperResponseFactory {
             total = 1,
             results = listOf(
                 CharacterResponse(
-                    id = "10113344",
+                    id = 10113344,
                     name = "One Punch Man",
                     thumbNail =  ThumbnailResponse(
                         path = "http://igaopk10.com.br/onepunchman",
