@@ -3,7 +3,7 @@ package com.igaopk10.core.usecase
 import com.igaopk10.core.data.repository.CharactersRepository
 import com.igaopk10.core.domain.model.Comic
 import com.igaopk10.core.domain.model.Event
-import com.igaopk10.core.usecase.base.AppCoroutinesDispatcher
+import com.igaopk10.core.usecase.base.CoroutinesDispatchers
 import com.igaopk10.core.usecase.base.ResultStatus
 import com.igaopk10.core.usecase.base.UseCase
 import kotlinx.coroutines.async
@@ -20,13 +20,13 @@ interface GetCharacterCategories {
 
 class GetCharacterCategoriesImpl @Inject constructor(
     private val repository: CharactersRepository,
-    private val dispatchers: AppCoroutinesDispatcher
+    private val dispatchers: CoroutinesDispatchers
 ) : GetCharacterCategories,
     UseCase<GetCharacterCategories.GetCharacterParams, Pair<List<Comic>, List<Event>>>() {
     override suspend fun doWork(
         params: GetCharacterCategories.GetCharacterParams
     ): ResultStatus<Pair<List<Comic>, List<Event>>> {
-        return withContext(dispatchers.io) {
+        return withContext(dispatchers.io()) {
             val comicsDeferred = async { repository.getComics(params.chacterId) }
             val eventDeferred = async { repository.getEvents(params.chacterId) }
 
