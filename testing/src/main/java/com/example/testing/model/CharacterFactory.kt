@@ -6,6 +6,7 @@ class CharacterFactory {
 
     fun create(hero: Hero): Character = when (hero) {
         Hero.OnePunchMan -> Character(
+            id = 0,
             name = "One Punch Man",
             imageUrl = "https://igaopk10.com.br/onepunchman.jpg"
         )

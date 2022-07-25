@@ -4,15 +4,24 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.39114583333333336" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/drawable/ic_dissatisfied.xml" value="0.334" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/drawable/ic_img_loading_error.xml" value="0.334" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/activity_main.xml" value="0.24954710144927536" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/detail_fragment.xml" value="0.3625" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/fragment_about.xml" value="0.3625" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/fragment_characters.xml" value="0.28940217391304346" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/fragment_detail.xml" value="0.3625" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/fragment_favorites.xml" value="0.3625" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/include_error_view.xml" value="0.3625" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/include_view_characters_error_state.xml" value="0.1762917933130699" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/include_view_characters_loading_state.xml" value="0.35733695652173914" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/include_view_detail_loading_state.xml" value="0.3625" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/item_character.xml" value="0.25" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/item_character_loading_state.xml" value="0.3625" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/item_child_detail.xml" value="0.3625" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/item_parent_detail.xml" value="0.3625" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/shimmer_layout_character_item.xml" value="0.35733695652173914" />
+        <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/layout/shimmer_layout_detail_item.xml" value="0.3625" />
         <entry key="..\:/Users/igorg/AndroidStudioProjects/curso-android-marvel-app/app/src/main/res/menu/app_menu_items.xml" value="0.3625" />
         <entry key="app/src/main/res/drawable/ic_back.xml" value="0.3861538461538462" />
         <entry key="app/src/main/res/drawable/ic_dissatisfied.xml" value="0.4066666666666667" />
