@@ -3,11 +3,13 @@ package com.example.marvelapp.presentation.details
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.example.marvelapp.R
+import com.example.marvelapp.presentation.details.actionstate.DetailFragmentUIActionState
 import com.example.testing.MainCoroutineRule
 import com.example.testing.model.CharacterFactory
 import com.example.testing.model.ComicFactory
 import com.example.testing.model.EventFactory
 import com.igaopk10.core.domain.model.Comic
+import com.igaopk10.core.usecase.AddFavoriteUseCase
 import com.igaopk10.core.usecase.GetCharacterCategories
 import com.igaopk10.core.usecase.base.ResultStatus
 import com.nhaarman.mockitokotlin2.any
@@ -40,7 +42,10 @@ class DetailViewModelTest() {
     private lateinit var getCharacterCategories: GetCharacterCategories
 
     @Mock
-    private lateinit var uiStateObserver: Observer<DetailViewModel.UiState>
+    private lateinit var getFavoriteUseCase: AddFavoriteUseCase
+
+    @Mock
+    private lateinit var uiStateObserver: Observer<DetailFragmentUIActionState.UiState>
 
     private lateinit var detailViewModel: DetailViewModel
 
@@ -50,10 +55,14 @@ class DetailViewModelTest() {
 
     @Before
     fun setup() {
-        detailViewModel = DetailViewModel(getCharacterCategories)
-        detailViewModel.uiState.observeForever(uiStateObserver)
+        detailViewModel = DetailViewModel(
+            useCase = getCharacterCategories,
+            addFavoriteUseCase = getFavoriteUseCase,
+            coroutineDispatcher = mainCoroutineRule.testDispatcherProvider
+        ).apply {
+            categories.state.observeForever(uiStateObserver)
+        }
     }
-
 
     @Test
     fun `should notify uiState with Success from UiState when get character categories returns success`() =
@@ -69,12 +78,13 @@ class DetailViewModelTest() {
                 )
 
             //Act
-            detailViewModel.getCharacterCategorys(character.id)
+            detailViewModel.categories.load(character.id)
 
             //Assert
-            verify(uiStateObserver).onChanged(isA<DetailViewModel.UiState.Success>())
+            verify(uiStateObserver).onChanged(isA<DetailFragmentUIActionState.UiState.Success>())
 
-            val uiStateSuccess = detailViewModel.uiState.value as DetailViewModel.UiState.Success
+            val uiStateSuccess =
+                detailViewModel.categories.state.value as DetailFragmentUIActionState.UiState.Success
             assertEquals(2, uiStateSuccess.detailParentList.size)
             assertEquals(
                 R.string.details_comics_category,
@@ -96,12 +106,13 @@ class DetailViewModelTest() {
                 )
 
             //Act
-            detailViewModel.getCharacterCategorys(character.id)
+            detailViewModel.categories.load(character.id)
 
             //Assert
-            verify(uiStateObserver).onChanged(isA<DetailViewModel.UiState.Success>())
+            verify(uiStateObserver).onChanged(isA<DetailFragmentUIActionState.UiState.Success>())
 
-            val uiStateSuccess = detailViewModel.uiState.value as DetailViewModel.UiState.Success
+            val uiStateSuccess =
+                detailViewModel.categories.state.value as DetailFragmentUIActionState.UiState.Success
             assertEquals(1, uiStateSuccess.detailParentList.size)
             assertEquals(
                 R.string.details_comics_category,
@@ -123,12 +134,13 @@ class DetailViewModelTest() {
                 )
 
             //Act
-            detailViewModel.getCharacterCategorys(character.id)
+            detailViewModel.categories.load(character.id)
 
             //Assert
-            verify(uiStateObserver).onChanged(isA<DetailViewModel.UiState.Success>())
+            verify(uiStateObserver).onChanged(isA<DetailFragmentUIActionState.UiState.Success>())
 
-            val uiStateSuccess = detailViewModel.uiState.value as DetailViewModel.UiState.Success
+            val uiStateSuccess =
+                detailViewModel.categories.state.value as DetailFragmentUIActionState.UiState.Success
             assertEquals(1, uiStateSuccess.detailParentList.size)
             assertEquals(
                 R.string.details_comics_events,
@@ -150,10 +162,10 @@ class DetailViewModelTest() {
                 )
 
             //Act
-            detailViewModel.getCharacterCategorys(character.id)
+            detailViewModel.categories.load(character.id)
 
             //Assert
-            verify(uiStateObserver).onChanged(isA<DetailViewModel.UiState.Empty>())
+            verify(uiStateObserver).onChanged(isA<DetailFragmentUIActionState.UiState.Empty>())
         }
 
     @Test
@@ -168,10 +180,10 @@ class DetailViewModelTest() {
                 )
 
             //Act
-            detailViewModel.getCharacterCategorys(character.id)
+            detailViewModel.categories.load(character.id)
 
             //Assert
-            verify(uiStateObserver).onChanged(isA<DetailViewModel.UiState.Error>())
+            verify(uiStateObserver).onChanged(isA<DetailFragmentUIActionState.UiState.Error>())
         }
 
 }
