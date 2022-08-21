@@ -93,6 +93,7 @@ android {
     //Configura o Orchestrator. Este serve para que os testes rodem todos, mesmo que algum falhem.
     testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
     }
 }
 
@@ -168,4 +169,6 @@ dependencies {
     //Runner orquestrator
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestUtil 'androidx.test:orchestrator:1.4.1'
+
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
 }
