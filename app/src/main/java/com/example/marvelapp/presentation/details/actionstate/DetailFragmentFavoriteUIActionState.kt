@@ -10,10 +10,12 @@ import com.example.marvelapp.R
 import com.example.marvelapp.presentation.details.DetailViewArgs
 import com.example.marvelapp.presentation.extensions.watchStatus
 import com.igaopk10.core.usecase.AddFavoriteUseCase
+import com.igaopk10.core.usecase.CheckFavoriteUseCase
 import kotlin.coroutines.CoroutineContext
 
 class DetailFragmentFavoriteUIActionState(
     private val coroutineContext: CoroutineContext,
+    private val checkFavoriteUseCase: CheckFavoriteUseCase,
     private val addFavoriteUseCase: AddFavoriteUseCase
 ) {
 
@@ -21,10 +23,20 @@ class DetailFragmentFavoriteUIActionState(
     val state: LiveData<UIState> = action.switchMap {
         liveData(context = coroutineContext) {
             when (it) {
-                UIAction.Default -> {
-                    emit(UIState.Success(R.drawable.ic_not_favorite_unchecked))
-                }
+                is UIAction.CheckFavorite -> {
+                    checkFavoriteUseCase.invoke(
+                        CheckFavoriteUseCase.Params(it.characterId)
+                    ).watchStatus(
+                        success = { isFavorite ->
+                            val icon = if(isFavorite) {
+                                R.drawable.ic_favorite_checked
+                            }else  R.drawable.ic_not_favorite_unchecked
 
+                            emit(UIState.Success(icon))
+                        },
+                        error = {}
+                    )
+                }
                 is UIAction.Update -> {
                     it.detailViewArgs.run {
                         addFavoriteUseCase.invoke(
@@ -47,8 +59,8 @@ class DetailFragmentFavoriteUIActionState(
     }
 
 
-    fun setDefault() {
-        action.value = UIAction.Default
+    fun checkFavorite(characterId: Int) {
+        action.value = UIAction.CheckFavorite(characterId)
     }
 
     fun update(detailViewArgs: DetailViewArgs) {
@@ -62,7 +74,7 @@ class DetailFragmentFavoriteUIActionState(
     }
 
     sealed class UIAction {
-        object Default : UIAction()
+        data class CheckFavorite(val characterId: Int) : UIAction()
         data class Update(val detailViewArgs: DetailViewArgs) : UIAction()
     }
 }

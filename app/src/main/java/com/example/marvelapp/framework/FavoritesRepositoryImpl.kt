@@ -14,4 +14,8 @@ class FavoritesRepositoryImpl @Inject constructor(
     override suspend fun saveFavorite(character: Character) = dataSource.save(character)
 
     override suspend fun deleteFavorite(character: Character) = dataSource.delete(character)
+
+    override suspend fun isFavorite(characterId: Int): Boolean {
+        return dataSource.isFavorite(characterId)
+    }
 }

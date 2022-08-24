@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.example.marvelapp.presentation.details.actionstate.DetailFragmentUIActionState
 import com.example.marvelapp.presentation.details.actionstate.DetailFragmentFavoriteUIActionState
 import com.igaopk10.core.usecase.AddFavoriteUseCase
+import com.igaopk10.core.usecase.CheckFavoriteUseCase
 import com.igaopk10.core.usecase.GetCharacterCategories
 import com.igaopk10.core.usecase.base.CoroutinesDispatchers
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     useCase: GetCharacterCategories,
+    checkFavoriteUseCase: CheckFavoriteUseCase,
     addFavoriteUseCase: AddFavoriteUseCase,
     coroutineDispatcher: CoroutinesDispatchers
 ) : ViewModel() {
@@ -23,10 +25,8 @@ class DetailViewModel @Inject constructor(
 
     val favorite = DetailFragmentFavoriteUIActionState(
         coroutineContext = coroutineDispatcher.main(),
-        addFavoriteUseCase = addFavoriteUseCase
+        addFavoriteUseCase = addFavoriteUseCase,
+        checkFavoriteUseCase = checkFavoriteUseCase
     )
 
-    init {
-        favorite.setDefault()
-    }
 }

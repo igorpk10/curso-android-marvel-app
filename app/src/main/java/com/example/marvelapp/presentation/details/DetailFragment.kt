@@ -10,8 +10,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.example.marvelapp.databinding.FragmentDetailBinding
 import com.example.marvelapp.framework.imageloader.ImageLoader
-import com.example.marvelapp.presentation.details.actionstate.DetailFragmentUIActionState
 import com.example.marvelapp.presentation.details.actionstate.DetailFragmentFavoriteUIActionState
+import com.example.marvelapp.presentation.details.actionstate.DetailFragmentUIActionState
 import com.example.marvelapp.presentation.extensions.showShortToast
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -95,20 +95,25 @@ class DetailFragment : Fragment() {
     }
 
     private fun setAndObserveFavoriteUIState(detailViewArg: DetailViewArgs) {
-        binding.imageFavoriteIcon.setOnClickListener {
-            viewModel.favorite.update(detailViewArg)
-        }
+        viewModel.favorite.run {
+            checkFavorite(detailViewArg.characterId)
 
-        viewModel.favorite.state.observe(viewLifecycleOwner) { favoriteUIState ->
-            binding.flipperFavorite.displayedChild = when (favoriteUIState) {
-                DetailFragmentFavoriteUIActionState.UIState.Loading -> FLIPPER_FAVORITE_CHILD_POSITION_LOADING
-                is DetailFragmentFavoriteUIActionState.UIState.Success -> {
-                    binding.imageFavoriteIcon.setImageResource(favoriteUIState.icon)
-                    FLIPPER_FAVORITE_CHILD_POSITION_IMAGE
-                }
-                is DetailFragmentFavoriteUIActionState.UIState.Error -> {
-                    showShortToast(favoriteUIState.messageResId)
-                    FLIPPER_FAVORITE_CHILD_POSITION_IMAGE
+            binding.imageFavoriteIcon.setOnClickListener {
+                update(detailViewArg)
+            }
+
+            state.observe(viewLifecycleOwner) { favoriteUIState ->
+                binding.flipperFavorite.displayedChild = when (favoriteUIState) {
+                    DetailFragmentFavoriteUIActionState.UIState.Loading -> FLIPPER_FAVORITE_CHILD_POSITION_LOADING
+                    is DetailFragmentFavoriteUIActionState.UIState.Success -> {
+                        binding.imageFavoriteIcon.setImageResource(favoriteUIState.icon)
+                        FLIPPER_FAVORITE_CHILD_POSITION_IMAGE
+                    }
+
+                    is DetailFragmentFavoriteUIActionState.UIState.Error -> {
+                        showShortToast(favoriteUIState.messageResId)
+                        FLIPPER_FAVORITE_CHILD_POSITION_IMAGE
+                    }
                 }
             }
         }

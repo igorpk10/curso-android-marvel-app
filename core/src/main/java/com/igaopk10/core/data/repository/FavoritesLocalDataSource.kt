@@ -10,4 +10,6 @@ interface FavoritesLocalDataSource {
     suspend fun save(character: Character)
 
     suspend fun delete(character: Character)
+
+    suspend fun isFavorite(characterId: Int): Boolean
 }

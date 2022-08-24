@@ -20,4 +20,7 @@ interface FavoriteDAO {
 
     @Delete
     suspend fun deleteFavorite(favoriteEntity: FavoriteEntity)
+
+    @Query("SELECT * FROM $FAVORITES_TABLE_NAME WHERE id = :characterID")
+    suspend fun hasFavorite(characterID: Int): FavoriteEntity?
 }

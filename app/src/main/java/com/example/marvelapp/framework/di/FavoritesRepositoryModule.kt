@@ -1,6 +1,5 @@
 package com.example.marvelapp.framework.di
 
-import androidx.room.Room
 import com.example.marvelapp.framework.FavoritesRepositoryImpl
 import com.example.marvelapp.framework.local.RoomFavoritesDataSource
 import com.igaopk10.core.data.repository.FavoritesLocalDataSource

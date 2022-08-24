@@ -10,4 +10,6 @@ interface FavoritesRepository {
     suspend fun saveFavorite(character: Character)
 
     suspend fun deleteFavorite(character: Character)
+
+    suspend fun isFavorite(characterId: Int): Boolean
 }
