@@ -1,13 +1,15 @@
 package com.example.marvelapp.framework.di
 
-import com.igaopk10.core.usecase.GetCharacterCategories
 import com.igaopk10.core.usecase.GetCharacterCategoriesImpl
-import com.igaopk10.core.usecase.GetCharactersUseCase
+import com.igaopk10.core.usecase.GetCharacterCategories
 import com.igaopk10.core.usecase.GetCharactersUseCaseImpl
-import com.igaopk10.core.usecase.AddFavoriteUseCase
-import com.igaopk10.core.usecase.AddFavoriteUseCaseImpl
-import com.igaopk10.core.usecase.CheckFavoriteUseCase
+import com.igaopk10.core.usecase.GetCharactersUseCase
+import com.igaopk10.core.usecase.RemoveFavoriteUseCase
+import com.igaopk10.core.usecase.RemoveFavoriteUseCaseImpl
 import com.igaopk10.core.usecase.CheckFavoriteUseCaseImpl
+import com.igaopk10.core.usecase.CheckFavoriteUseCase
+import com.igaopk10.core.usecase.AddFavoriteUseCaseImpl
+import com.igaopk10.core.usecase.AddFavoriteUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -29,4 +31,6 @@ interface UseCaseModule {
     @Binds
     fun bindAddFavoritesUseCase(useCase: AddFavoriteUseCaseImpl): AddFavoriteUseCase
 
+    @Binds
+    fun bindRemoveFavoritesUseCase(useCase: RemoveFavoriteUseCaseImpl): RemoveFavoriteUseCase
 }
