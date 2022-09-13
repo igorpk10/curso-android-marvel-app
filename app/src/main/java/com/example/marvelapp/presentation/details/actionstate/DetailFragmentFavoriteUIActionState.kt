@@ -2,6 +2,7 @@ package com.example.marvelapp.presentation.details.actionstate
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
@@ -22,7 +23,8 @@ class DetailFragmentFavoriteUIActionState(
     private val removeFavoriteUseCase: RemoveFavoriteUseCase
 ) {
 
-    private var currentFavoriteIcon = R.drawable.ic_not_favorite_unchecked
+    @set:VisibleForTesting
+    var currentFavoriteIcon = R.drawable.ic_not_favorite_unchecked
 
     private val action = MutableLiveData<UIAction>()
     val state: LiveData<UIState> = action.switchMap {

@@ -3,6 +3,7 @@ package com.example.marvelapp.presentation.details
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.example.marvelapp.R
+import com.example.marvelapp.presentation.details.actionstate.DetailFragmentFavoriteUIActionState
 import com.example.marvelapp.presentation.details.actionstate.DetailFragmentUIActionState
 import com.example.testing.MainCoroutineRule
 import com.example.testing.model.CharacterFactory
@@ -10,7 +11,9 @@ import com.example.testing.model.ComicFactory
 import com.example.testing.model.EventFactory
 import com.igaopk10.core.domain.model.Comic
 import com.igaopk10.core.usecase.AddFavoriteUseCase
+import com.igaopk10.core.usecase.CheckFavoriteUseCase
 import com.igaopk10.core.usecase.GetCharacterCategories
+import com.igaopk10.core.usecase.RemoveFavoriteUseCase
 import com.igaopk10.core.usecase.base.ResultStatus
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.isA
@@ -45,7 +48,16 @@ class DetailViewModelTest() {
     private lateinit var getFavoriteUseCase: AddFavoriteUseCase
 
     @Mock
+    private lateinit var getCheckFavoriteUseCase: CheckFavoriteUseCase
+
+    @Mock
+    private lateinit var getRemoveFavoriteUseCase: RemoveFavoriteUseCase
+
+    @Mock
     private lateinit var uiStateObserver: Observer<DetailFragmentUIActionState.UiState>
+
+    @Mock
+    private lateinit var favoriteUIStateObserver: Observer<DetailFragmentFavoriteUIActionState.UIState>
 
     private lateinit var detailViewModel: DetailViewModel
 
@@ -58,9 +70,12 @@ class DetailViewModelTest() {
         detailViewModel = DetailViewModel(
             useCase = getCharacterCategories,
             addFavoriteUseCase = getFavoriteUseCase,
-            coroutineDispatcher = mainCoroutineRule.testDispatcherProvider
+            coroutineDispatcher = mainCoroutineRule.testDispatcherProvider,
+            checkFavoriteUseCase = getCheckFavoriteUseCase,
+            removeFavoriteUseCase = getRemoveFavoriteUseCase
         ).apply {
             categories.state.observeForever(uiStateObserver)
+            favorite.state.observeForever(favoriteUIStateObserver)
         }
     }
 
@@ -184,6 +199,110 @@ class DetailViewModelTest() {
 
             //Assert
             verify(uiStateObserver).onChanged(isA<DetailFragmentUIActionState.UiState.Error>())
+        }
+
+
+    @Test
+    fun `should notify favorite_uiState with filled favorite icon when check favorite returns true`() =
+        runTest {
+            // Arrange
+            whenever(getCheckFavoriteUseCase.invoke(any()))
+                .thenReturn(
+                    flowOf(
+                        ResultStatus.Success(true)
+                    )
+                )
+
+            // Action
+
+            detailViewModel.favorite.checkFavorite(character.id)
+
+            // Assert
+            verify(favoriteUIStateObserver).onChanged(
+                isA<DetailFragmentFavoriteUIActionState.UIState.Success>()
+            )
+
+            val result =
+                detailViewModel.favorite.state.value as DetailFragmentFavoriteUIActionState.UIState.Success
+            assertEquals(result.icon, R.drawable.ic_favorite_checked)
+        }
+
+    @Test
+    fun `should notify favorite_uiState with not filled favorite icon when check favorite returns false`() =
+        runTest {
+            // Arrange
+            whenever(getCheckFavoriteUseCase.invoke(any()))
+                .thenReturn(
+                    flowOf(
+                        ResultStatus.Success(false)
+                    )
+                )
+
+            // Action
+
+            detailViewModel.favorite.checkFavorite(character.id)
+
+            // Assert
+            verify(favoriteUIStateObserver).onChanged(
+                isA<DetailFragmentFavoriteUIActionState.UIState.Success>()
+            )
+
+            val result =
+                detailViewModel.favorite.state.value as DetailFragmentFavoriteUIActionState.UIState.Success
+            assertEquals(result.icon, R.drawable.ic_not_favorite_unchecked)
+        }
+
+
+    @Test
+    fun `should notify favorite_uiState with filled favorite icon when current icon is unchecked`() =
+        runTest {
+            // Arrange
+            whenever(getFavoriteUseCase.invoke(any()))
+                .thenReturn(
+                    flowOf(
+                        ResultStatus.Success(Unit)
+                    )
+                )
+
+            // Act
+            detailViewModel.run {
+                favorite.currentFavoriteIcon = R.drawable.ic_not_favorite_unchecked
+                favorite.update(
+                    DetailViewArgs(character.id, character.name, character.imageUrl)
+                )
+            }
+
+            // Assert
+            verify(favoriteUIStateObserver).onChanged(isA<DetailFragmentFavoriteUIActionState.UIState.Success>())
+            val uiState =
+                detailViewModel.favorite.state.value as DetailFragmentFavoriteUIActionState.UIState.Success
+            assertEquals(R.drawable.ic_favorite_checked, uiState.icon)
+        }
+
+    @Test
+    fun `should call remove and notify favorite_uiState with filled favorite icon when current icon is checked`() =
+        runTest {
+            // Arrange
+            whenever(getRemoveFavoriteUseCase.invoke(any()))
+                .thenReturn(
+                    flowOf(
+                        ResultStatus.Success(Unit)
+                    )
+                )
+
+            // Act
+            detailViewModel.run {
+                favorite.currentFavoriteIcon = R.drawable.ic_favorite_checked
+                favorite.update(
+                    DetailViewArgs(character.id, character.name, character.imageUrl)
+                )
+            }
+
+            // Assert
+            verify(favoriteUIStateObserver).onChanged(isA<DetailFragmentFavoriteUIActionState.UIState.Success>())
+            val uiState =
+                detailViewModel.favorite.state.value as DetailFragmentFavoriteUIActionState.UIState.Success
+            assertEquals(R.drawable.ic_not_favorite_unchecked, uiState.icon)
         }
 
 }
