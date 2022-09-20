@@ -1,80 +1,35 @@
 package com.example.marvelapp.presentation.details
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.marvelapp.R
-import com.igaopk10.core.domain.model.Comic
-import com.igaopk10.core.domain.model.Event
+import com.example.marvelapp.presentation.details.actionstate.DetailFragmentUIActionState
+import com.example.marvelapp.presentation.details.actionstate.DetailFragmentFavoriteUIActionState
+import com.igaopk10.core.usecase.AddFavoriteUseCase
+import com.igaopk10.core.usecase.CheckFavoriteUseCase
 import com.igaopk10.core.usecase.GetCharacterCategories
-import com.igaopk10.core.usecase.base.ResultStatus
+import com.igaopk10.core.usecase.RemoveFavoriteUseCase
+import com.igaopk10.core.usecase.base.CoroutinesDispatchers
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val useCase: GetCharacterCategories
+    useCase: GetCharacterCategories,
+    checkFavoriteUseCase: CheckFavoriteUseCase,
+    addFavoriteUseCase: AddFavoriteUseCase,
+    removeFavoriteUseCase: RemoveFavoriteUseCase,
+    coroutineDispatcher: CoroutinesDispatchers
 ) : ViewModel() {
 
-    private val _uiState = MutableLiveData<UiState>()
-    val uiState: LiveData<UiState> get() = _uiState
+    val categories = DetailFragmentUIActionState(
+        coroutineContext = coroutineDispatcher.main(),
+        getCharactersCategoriesUseCase = useCase
+    )
 
-    fun getCharacterCategorys(characterId: Int) = viewModelScope.launch {
-        useCase(GetCharacterCategories.GetCharacterParams(characterId)).watchStatus()
-    }
-
-    private fun Flow<ResultStatus<Pair<List<Comic>, List<Event>>>>.watchStatus() =
-        viewModelScope.launch {
-            collect { status ->
-                _uiState.value = when (status) {
-                    ResultStatus.Loading -> UiState.Loading
-                    is ResultStatus.Success -> {
-                        val detailParentList: MutableList<DetailParentVE> = mutableListOf()
-                        val comics = status.data.first
-                        if (comics.isNotEmpty()) {
-                            comics.map {
-                                DetailChildVE(it.id, it.imageURL)
-                            }.also {
-                                detailParentList.add(
-                                    DetailParentVE(
-                                        R.string.details_comics_category,
-                                        it
-                                    )
-                                )
-                            }
-                        }
-
-                        val events = status.data.second
-                        if (events.isNotEmpty()) {
-                            events.map {
-                                DetailChildVE(it.id, it.imageURL)
-                            }.also {
-                                detailParentList.add(
-                                    DetailParentVE(
-                                        R.string.details_comics_events,
-                                        it
-                                    )
-                                )
-                            }
-                        }
-
-                        if (detailParentList.isNotEmpty()) {
-                            UiState.Success(detailParentList)
-                        } else UiState.Empty
-                    }
-                    is ResultStatus.Error -> UiState.Error
-                }
-            }
-        }
-
-    sealed class UiState {
-        object Loading : UiState()
-        data class Success(val detailParentList: List<DetailParentVE>) : UiState()
-        object Error : UiState()
-        object Empty : UiState()
-    }
+    val favorite = DetailFragmentFavoriteUIActionState(
+        coroutineContext = coroutineDispatcher.main(),
+        addFavoriteUseCase = addFavoriteUseCase,
+        checkFavoriteUseCase = checkFavoriteUseCase,
+        removeFavoriteUseCase = removeFavoriteUseCase
+    )
 
 }
