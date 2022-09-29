@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.igaopk10.core.data.repository.CharactersRemoteDataSource
 import com.igaopk10.core.domain.model.Character
 
+//Implementação antiga do mediator sem cache local
 class CharactersPagingSource(
     private val remoteDataSource: CharactersRemoteDataSource,
     private val query: String

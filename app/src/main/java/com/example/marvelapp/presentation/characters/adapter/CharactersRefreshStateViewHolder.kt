@@ -1,4 +1,4 @@
-package com.example.marvelapp.presentation.characters
+package com.example.marvelapp.presentation.characters.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,28 +6,29 @@ import androidx.core.view.isVisible
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marvelapp.databinding.ItemCharacterLoadingStateBinding
+import com.example.marvelapp.databinding.ItemCharacterRefreshStateBinding
 
-class CharactersLoadMoreStateViewHolder(
-    view: ItemCharacterLoadingStateBinding,
+class CharactersRefreshStateViewHolder(
+    view: ItemCharacterRefreshStateBinding,
     val retry: () -> Unit
 ) : RecyclerView.ViewHolder(view.root) {
 
     companion object {
 
-        fun create(parent: ViewGroup, retry: () -> Unit): CharactersLoadMoreStateViewHolder {
-            val itemBinding = ItemCharacterLoadingStateBinding.inflate(
+        fun create(parent: ViewGroup, retry: () -> Unit): CharactersRefreshStateViewHolder {
+            val itemBinding = ItemCharacterRefreshStateBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
 
-            return CharactersLoadMoreStateViewHolder(itemBinding, retry)
+            return CharactersRefreshStateViewHolder(itemBinding, retry)
         }
 
     }
 
-    val binding = ItemCharacterLoadingStateBinding.bind(itemView)
-    private val progressBarLoadingMore = binding.progressLoadingMore
+    val binding = ItemCharacterRefreshStateBinding.bind(itemView)
+    private val progressBarRefresh = binding.progressLoadingRefresh
     private val textTryAgainMessage = binding.textTryAgain.also {
         it.setOnClickListener {
             retry()
@@ -35,7 +36,7 @@ class CharactersLoadMoreStateViewHolder(
     }
 
     fun bind(loadState: LoadState) {
-        progressBarLoadingMore.isVisible = loadState is LoadState.Loading
+        progressBarRefresh.isVisible = loadState is LoadState.Loading
         textTryAgainMessage.isVisible = loadState is LoadState.Error
     }
 }

@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -14,6 +13,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import com.example.marvelapp.databinding.FragmentCharactersBinding
 import com.example.marvelapp.framework.imageloader.ImageLoader
+import com.example.marvelapp.presentation.characters.adapter.CharactersAdapter
+import com.example.marvelapp.presentation.characters.adapter.CharactersLoadingMoreStateAdapter
+import com.example.marvelapp.presentation.characters.adapter.CharactersRefreshStateAdapter
 import com.example.marvelapp.presentation.details.DetailViewArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -55,6 +57,12 @@ class CharactersFragment : Fragment() {
     @Inject
     lateinit var imageLoader: ImageLoader
 
+    private val headerAdapter: CharactersRefreshStateAdapter by lazy {
+        CharactersRefreshStateAdapter(
+            characterAdapter::retry
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -84,9 +92,12 @@ class CharactersFragment : Fragment() {
         postponeEnterTransition()
         with(binding.recyclerCharacters) {
             setHasFixedSize(true)
-            adapter = characterAdapter.withLoadStateFooter(CharactersLoadingStateAdapter {
-                characterAdapter.retry()
-            })
+            adapter = characterAdapter.withLoadStateHeaderAndFooter(
+                header = headerAdapter,
+                footer = CharactersLoadingMoreStateAdapter {
+                    characterAdapter.retry()
+                }
+            )
 
             viewTreeObserver.addOnPreDrawListener {
                 startPostponedEnterTransition()
@@ -98,21 +109,41 @@ class CharactersFragment : Fragment() {
     private fun observeInitialLoadingState() {
         lifecycleScope.launch {
             characterAdapter.loadStateFlow.collectLatest { loadState ->
-                binding.flipperCharacters.displayedChild = when (loadState.refresh) {
-                    LoadState.Loading -> {
+
+                headerAdapter.loadState = loadState.mediator?.refresh?.takeIf {
+                    it is LoadState.Error && characterAdapter.itemCount > 0
+                } ?: loadState.prepend
+
+                binding.flipperCharacters.displayedChild = when {
+
+                    //Caso de loading
+                    loadState.mediator?.refresh is LoadState.Loading -> {
                         setShimmerVisibility(true)
                         FLIPPER_CHILD_LOADING
                     }
-                    is LoadState.NotLoading -> {
-                        setShimmerVisibility(false)
-                        FLIPPER_CHILD_CHARACTERS
-                    }
-                    is LoadState.Error -> {
+
+
+                    //Caso local
+                    loadState.mediator?.refresh is LoadState.Error
+                            && characterAdapter.itemCount == 0 -> {
                         setShimmerVisibility(false)
                         binding.includeViewCharactersErrorState.buttonRetry.setOnClickListener {
                             characterAdapter.refresh()
                         }
                         FLIPPER_CHILD_ERROR
+                    }
+
+
+                    //Caso de sucesso
+                    loadState.source.refresh is LoadState.NotLoading
+                            || loadState.mediator?.refresh is LoadState.NotLoading -> {
+                        setShimmerVisibility(false)
+                        FLIPPER_CHILD_CHARACTERS
+                    }
+
+                    else -> {
+                        setShimmerVisibility(false)
+                        FLIPPER_CHILD_CHARACTERS
                     }
                 }
             }
