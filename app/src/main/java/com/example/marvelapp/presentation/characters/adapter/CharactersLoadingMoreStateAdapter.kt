@@ -1,10 +1,10 @@
-package com.example.marvelapp.presentation.characters
+package com.example.marvelapp.presentation.characters.adapter
 
 import android.view.ViewGroup
 import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
 
-class CharactersLoadingStateAdapter(
+class CharactersLoadingMoreStateAdapter(
     private val retry: () -> Unit
 ) : LoadStateAdapter<CharactersLoadMoreStateViewHolder>() {
 

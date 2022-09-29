@@ -14,7 +14,7 @@ import com.example.marvelapp.framework.db.entity.RemoteKeyEntity
         FavoriteEntity::class,
         CharacterEntity::class,
         RemoteKeyEntity::class
-    ], version = 1, exportSchema = false
+    ], version = 2, exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
