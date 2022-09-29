@@ -15,6 +15,7 @@ import com.example.marvelapp.databinding.FragmentCharactersBinding
 import com.example.marvelapp.framework.imageloader.ImageLoader
 import com.example.marvelapp.presentation.characters.adapter.CharactersAdapter
 import com.example.marvelapp.presentation.characters.adapter.CharactersLoadingMoreStateAdapter
+import com.example.marvelapp.presentation.characters.adapter.CharactersRefreshStateAdapter
 import com.example.marvelapp.presentation.details.DetailViewArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -56,6 +57,12 @@ class CharactersFragment : Fragment() {
     @Inject
     lateinit var imageLoader: ImageLoader
 
+    private val headerAdapter: CharactersRefreshStateAdapter by lazy {
+        CharactersRefreshStateAdapter(
+            characterAdapter::retry
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -85,9 +92,12 @@ class CharactersFragment : Fragment() {
         postponeEnterTransition()
         with(binding.recyclerCharacters) {
             setHasFixedSize(true)
-            adapter = characterAdapter.withLoadStateFooter(CharactersLoadingMoreStateAdapter {
-                characterAdapter.retry()
-            })
+            adapter = characterAdapter.withLoadStateHeaderAndFooter(
+                header = headerAdapter,
+                footer = CharactersLoadingMoreStateAdapter {
+                    characterAdapter.retry()
+                }
+            )
 
             viewTreeObserver.addOnPreDrawListener {
                 startPostponedEnterTransition()
@@ -99,6 +109,11 @@ class CharactersFragment : Fragment() {
     private fun observeInitialLoadingState() {
         lifecycleScope.launch {
             characterAdapter.loadStateFlow.collectLatest { loadState ->
+
+                headerAdapter.loadState = loadState.mediator?.refresh?.takeIf {
+                    it is LoadState.Error && characterAdapter.itemCount > 0
+                } ?: loadState.prepend
+
                 binding.flipperCharacters.displayedChild = when {
 
                     //Caso de loading
