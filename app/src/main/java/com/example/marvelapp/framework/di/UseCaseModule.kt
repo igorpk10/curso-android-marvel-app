@@ -12,6 +12,10 @@ import com.igaopk10.core.usecase.AddFavoriteUseCaseImpl
 import com.igaopk10.core.usecase.AddFavoriteUseCase
 import com.igaopk10.core.usecase.RemoveFavoriteUseCaseImpl
 import com.igaopk10.core.usecase.RemoveFavoriteUseCase
+import com.igaopk10.core.usecase.GetCharactersSortingUseCaseImpl
+import com.igaopk10.core.usecase.GetCharactersSortingUseCase
+import com.igaopk10.core.usecase.SaveCharactersSortingUseCaseImpl
+import com.igaopk10.core.usecase.SaveCharactersSortingUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -38,4 +42,10 @@ interface UseCaseModule {
 
     @Binds
     fun bindRemoveFavoritesUseCase(useCase: RemoveFavoriteUseCaseImpl): RemoveFavoriteUseCase
+
+    @Binds
+    fun bindGetCharacterSortingUSeCase(useCase: GetCharactersSortingUseCaseImpl): GetCharactersSortingUseCase
+
+    @Binds
+    fun bindSaveCharactersSortingUseCase(useCase: SaveCharactersSortingUseCaseImpl): SaveCharactersSortingUseCase
 }

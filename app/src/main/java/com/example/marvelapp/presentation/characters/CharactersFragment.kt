@@ -1,16 +1,20 @@
 package com.example.marvelapp.presentation.characters
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.View
+import android.view.MenuItem
+import androidx.fragment.app.Fragment
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import com.example.marvelapp.R
 import com.example.marvelapp.databinding.FragmentCharactersBinding
 import com.example.marvelapp.framework.imageloader.ImageLoader
 import com.example.marvelapp.presentation.characters.adapter.CharactersAdapter
@@ -66,9 +70,27 @@ class CharactersFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCharactersBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.characters_menu_items, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_sort -> {
+                findNavController().navigate(R.id.action_charactersFragment_to_sortFragment)
+                true
+            } else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
