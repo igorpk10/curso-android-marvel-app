@@ -7,9 +7,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.MenuItem
+import androidx.appcompat.widget.SearchView
+
 import androidx.fragment.app.Fragment
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -21,13 +25,18 @@ import com.example.marvelapp.presentation.characters.adapter.CharactersAdapter
 import com.example.marvelapp.presentation.characters.adapter.CharactersLoadingMoreStateAdapter
 import com.example.marvelapp.presentation.characters.adapter.CharactersRefreshStateAdapter
 import com.example.marvelapp.presentation.details.DetailViewArgs
+import com.example.marvelapp.presentation.sort.SortFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class CharactersFragment : Fragment() {
+@Suppress("TooManyFunctions")
+class CharactersFragment :
+    Fragment(),
+    SearchView.OnQueryTextListener,
+    MenuItem.OnActionExpandListener {
 
     companion object {
         private const val FLIPPER_CHILD_LOADING = 0
@@ -36,6 +45,8 @@ class CharactersFragment : Fragment() {
     }
 
     private lateinit var binding: FragmentCharactersBinding
+    private lateinit var searchView: SearchView
+
     private val characterAdapter: CharactersAdapter by lazy {
         CharactersAdapter(imageLoader) { character, view ->
             val extras = FragmentNavigatorExtras(
@@ -82,6 +93,34 @@ class CharactersFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.characters_menu_items, menu)
+
+        val searchItem = menu.findItem(R.id.menu_search)
+        searchView = searchItem.actionView as SearchView
+
+        searchItem.setOnActionExpandListener(this)
+
+        if(viewModel.currentSearchQuery.isNotEmpty()){
+            searchItem.expandActionView()
+            searchView.setQuery(viewModel.currentSearchQuery,false)
+        }
+
+        searchView.apply {
+            isSubmitButtonEnabled = true
+            setOnQueryTextListener(this@CharactersFragment)
+        }
+    }
+
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return query?.let {
+            viewModel.currentSearchQuery = it
+            viewModel.searchCharacters()
+            true
+        } ?: false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,7 +128,8 @@ class CharactersFragment : Fragment() {
             R.id.menu_sort -> {
                 findNavController().navigate(R.id.action_charactersFragment_to_sortFragment)
                 true
-            } else -> super.onOptionsItemSelected(item)
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 
@@ -98,6 +138,7 @@ class CharactersFragment : Fragment() {
 
         initCharactersAdapter()
         observeInitialLoadingState()
+        observeSortingData()
 
         viewModel.state.observe(viewLifecycleOwner) {
             when (it) {
@@ -181,4 +222,38 @@ class CharactersFragment : Fragment() {
         }
     }
 
+    /**
+     * Wheneaver works with fragment + dialogFragment
+     * the documentation says to use backstackentry and not currentbackstack
+     * fuckit
+     */
+    private fun observeSortingData() {
+        val navBackStackEntry = findNavController().getBackStackEntry(R.id.charactersFragment)
+        val observer = LifecycleEventObserver { _, event ->
+            val isSortingApplied =
+                navBackStackEntry.savedStateHandle.contains(SortFragment.SORTING_APPLIED_BASK_STACK_KEY)
+            if (event == Lifecycle.Event.ON_RESUME && isSortingApplied) {
+                viewModel.applySort()
+                navBackStackEntry.savedStateHandle.remove<Boolean>(SortFragment.SORTING_APPLIED_BASK_STACK_KEY)
+            }
+        }
+
+        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                navBackStackEntry.lifecycle.removeObserver(observer)
+            }
+        })
+
+        navBackStackEntry.lifecycle.addObserver(observer)
+    }
+
+    override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+        return true
+    }
+
+    override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+        viewModel.closeSearch()
+        viewModel.searchCharacters()
+        return true
+    }
 }

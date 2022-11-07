@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CharactersRepository {
 
-    fun getCachedCharacter(query: String, pageConfig: PagingConfig): Flow<PagingData<Character>>
+    fun getCachedCharacter(query: String, orderBy: String ,pageConfig: PagingConfig): Flow<PagingData<Character>>
 
     suspend fun getComics(characterId: Int): List<Comic>
 

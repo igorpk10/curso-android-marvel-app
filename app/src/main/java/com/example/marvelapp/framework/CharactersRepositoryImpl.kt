@@ -5,6 +5,7 @@ import androidx.paging.PagingData
 import androidx.paging.Pager
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.map
+import androidx.room.Index
 import com.example.marvelapp.framework.db.AppDatabase
 import com.example.marvelapp.framework.paging.CharactersRemoteMediator
 import com.igaopk10.core.data.repository.CharactersRemoteDataSource
@@ -24,6 +25,7 @@ class CharactersRepositoryImpl @Inject constructor(
 
     override fun getCachedCharacter(
         query: String,
+        orderBy: String,
         pageConfig: PagingConfig
     ): Flow<PagingData<Character>> {
         return Pager(
@@ -31,7 +33,8 @@ class CharactersRepositoryImpl @Inject constructor(
             remoteMediator = CharactersRemoteMediator(
                 query = query,
                 database = database,
-                remoteDataSource = remoteDataSource
+                remoteDataSource = remoteDataSource,
+                orderBy = orderBy
             )
         ) {
             database.characterDao().pagingSource()

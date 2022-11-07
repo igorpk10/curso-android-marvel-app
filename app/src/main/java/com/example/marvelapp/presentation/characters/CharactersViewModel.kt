@@ -24,12 +24,14 @@ class CharactersViewModel @Inject constructor(
     private val coroutineDispatcher: CoroutinesDispatchers
 ) : ViewModel() {
 
+    var currentSearchQuery = ""
+
     private val action = MutableLiveData<Action>()
-    val state: LiveData<UIState> = action.distinctUntilChanged().switchMap {
+    val state: LiveData<UIState> = action.switchMap {
         when (it) {
-            is Action.Search -> {
+            is Action.Search, Action.Sort -> {
                 getCharactersUseCase(
-                    GetCharactersUseCase.GetCharactersParams(it.query, getPageConfig())
+                    GetCharactersUseCase.GetCharactersParams(currentSearchQuery, getPageConfig())
                 ).cachedIn(viewModelScope).map { data ->
                     UIState.SearchResult(data)
                 }.asLiveData(coroutineDispatcher.main())
@@ -37,14 +39,24 @@ class CharactersViewModel @Inject constructor(
         }
     }
 
-    fun searchCharacters(query: String = "") {
-        action.value = Action.Search(query)
+    fun searchCharacters() {
+        action.value = Action.Search
     }
 
     fun charactersPagingData(query: String): Flow<PagingData<Character>> {
         return getCharactersUseCase(
             GetCharactersUseCase.GetCharactersParams(query, getPageConfig())
         ).cachedIn(viewModelScope)
+    }
+
+    fun applySort(){
+        action.value = Action.Sort
+    }
+
+    fun closeSearch() {
+        if (currentSearchQuery.isNotEmpty()) {
+            currentSearchQuery = ""
+        }
     }
 
     private fun getPageConfig() = PagingConfig(
@@ -56,6 +68,7 @@ class CharactersViewModel @Inject constructor(
     }
 
     sealed class Action {
-        data class Search(val query: String) : Action()
+        object Search : Action()
+        object Sort: Action()
     }
 }
