@@ -17,6 +17,7 @@ import org.junit.Test
 import org.junit.Assert.assertTrue
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito.lenient
 import org.mockito.junit.MockitoJUnitRunner
 
 @ExperimentalCoroutinesApi
@@ -81,7 +82,7 @@ class GetCharacterCategoriesImplTest {
         runTest {
             //Arrange
             whenever(repository.getComics(characterId = character.id)).thenAnswer { throw  Throwable() }
-            whenever(repository.getEvents(characterId = character.id)).thenReturn(events)
+            lenient().`when`(repository.getEvents(characterId = character.id)).thenReturn(events)
 
             //Act
             val result = getCharactersUseCase.invoke(GetCharacterCategories.GetCharacterParams(character.id))
